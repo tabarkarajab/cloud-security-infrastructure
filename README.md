@@ -9,7 +9,10 @@ The objective is to establish secure communication between two cloud providers w
 
 ## Cloud Architecture
 
-* **Provider A — AWS:** Hosts the private PostgreSQL database and the first VPN gateway.
+* **Provider A — Microsoft Azure:** Hosts the private PostgreSQL database and the first VPN gateway.
+
+<img width="1665" height="1199" alt="image" src="https://github.com/user-attachments/assets/e63c1fef-639d-421c-b2ed-91f218ae003c" />
+
 * **Provider B — DigitalOcean:** Hosts the public web service and the second VPN gateway.
 * **Site-to-Site VPN:** WireGuard provides an encrypted connection between the two cloud networks.
 * **Database connectivity:** The web service accesses the private database through the VPN tunnel.
