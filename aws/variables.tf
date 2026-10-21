@@ -9,3 +9,9 @@ variable "do_vpn_public_ip" {
   type        = string
   default     = "207.154.238.161/32"
 }
+
+variable "db_password" {
+  description = "Master password of the PostgreSQL database (set via TF_VAR_db_password secret)"
+  type        = string
+  sensitive   = true
+}
