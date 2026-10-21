@@ -1,0 +1,42 @@
+name: terraform-aws
+on:
+  workflow_dispatch:
+  pull_request:
+    paths: ["aws/**"]
+  push:
+    branches: [main]
+    paths: ["aws/**"]
+
+env:
+  AWS_REGION: eu-north-1
+  TF_VAR_db_password: ${{ secrets.TF_VAR_db_password }}
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: aws
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: Sanitize AWS credentials
+        env:
+          RAW_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          RAW_SECRET: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          ID=$(printf '%s' "$RAW_ID" | tr -cd 'A-Z0-9')
+          SECRET=$(printf '%s' "$RAW_SECRET" | tr -cd 'A-Za-z0-9/+=')
+          echo "::add-mask::$ID"
+          echo "::add-mask::$SECRET"
+          echo "raw lengths: ${#RAW_ID} / ${#RAW_SECRET}"
+          echo "clean lengths: ${#ID} / ${#SECRET}"
+          echo "AWS_ACCESS_KEY_ID=$ID" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$SECRET" >> "$GITHUB_ENV"
+      - run: terraform fmt -check
+      - run: terraform init
+      - run: terraform validate
+      - run: terraform plan -out=tfplan
+      - name: Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve tfplan
