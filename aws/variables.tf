@@ -7,5 +7,5 @@ variable "do_cidr" {
 variable "do_vpn_public_ip" {
   description = "Public IP of the VPN droplet at provider B, as /32"
   type        = string
-  default     = "207.154.238.161"
+  default     = "207.154.238.161/32"
 }
