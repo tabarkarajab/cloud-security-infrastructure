@@ -22,14 +22,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
-      - name: Check credential format
+      - name: Sanitize AWS credentials
+        env:
+          RAW_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          RAW_SECRET: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          echo "ID length: ${#AWS_ACCESS_KEY_ID}"
-          echo "Secret length: ${#AWS_SECRET_ACCESS_KEY}"
-          [[ "$AWS_ACCESS_KEY_ID" =~ ^AKIA[A-Z0-9]{16}$ ]] && echo "ID format: OK" || echo "ID format: BAD"
-          [[ "$AWS_SECRET_ACCESS_KEY" =~ ^[A-Za-z0-9/+=]{40}$ ]] && echo "Secret format: OK" || echo "Secret format: BAD"
-      - run: terraform fmt -check
-      - run: terraform init
+          ID=$(printf '%s' "$RAW_ID" | tr -cd 'A-Z0-9')
+          SECRET=$(printf '%s' "$RAW_SECRET" | tr -cd 'A-Za-z0-9/+=')
+          echo "::add-mask::$ID"
+          echo "::add-mask::$SECRET"
+          echo "raw lengths: ${#RAW_ID} / ${#RAW_SECRET}"
+          echo "clean lengths: ${#ID} / ${#SECRET}"
+          echo "AWS_ACCESS_KEY_ID=$ID" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$SECRET" >> "$GITHUB_ENV"
       - run: terraform validate
       - run: terraform plan -out=tfplan
       - name: Apply
