@@ -2,9 +2,8 @@ name: Web Application CI-CD
 
 on:
   push:
-    branches:
-      - digitalocean-setup
-      - main
+    branches: [main]
+    paths: ["webapp/**"]
 
   pull_request:
     branches:
