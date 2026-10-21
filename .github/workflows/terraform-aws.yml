@@ -27,7 +27,7 @@ jobs:
           echo "ID length: ${#AWS_ACCESS_KEY_ID}"
           echo "Secret length: ${#AWS_SECRET_ACCESS_KEY}"
           [[ "$AWS_ACCESS_KEY_ID" =~ ^AKIA[A-Z0-9]{16}$ ]] && echo "ID format: OK" || echo "ID format: BAD"
-          [[ "$AWS_SECRET_ACCESS_KEY" =~ ^[A-Za-z0-9/+=]{40}$ ]] && echo "Secret format: OK" || echo "Secret format: BAD"
+          [[ "$AWS_SECRET_ACCESS_KEY" =~ ^[A-Za-z0-9/+=]{40}$ ]] && echo "Secret format: OK" || echo "Secret format: BAD" 
       - run: terraform init
       - run: terraform validate
       - run: terraform plan -out=tfplan
