@@ -1,5 +1,6 @@
 name: terraform-aws
 on:
+  workflow_dispatch:
   pull_request:
     paths: ["aws/**"]
   push:
@@ -21,6 +22,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
+      - name: Check credential format
+        run: |
+          echo "ID length: ${#AWS_ACCESS_KEY_ID}"
+          echo "Secret length: ${#AWS_SECRET_ACCESS_KEY}"
+          [[ "$AWS_ACCESS_KEY_ID" =~ ^AKIA[A-Z0-9]{16}$ ]] && echo "ID format: OK" || echo "ID format: BAD"
+          [[ "$AWS_SECRET_ACCESS_KEY" =~ ^[A-Za-z0-9/+=]{40}$ ]] && echo "Secret format: OK" || echo "Secret format: BAD"
       - run: terraform fmt -check
       - run: terraform init
       - run: terraform validate
